@@ -83,6 +83,7 @@ def get_founder_image():
             return f
     return None
 
+
 # ---- BEAUTIFUL ORIGINAL DESIGN ----
 if not st.session_state.show_store:
     st.markdown("<h2 style='color:#0a3d6b; text-align:center;'>Welcome Valued Customer</h2>", unsafe_allow_html=True)
