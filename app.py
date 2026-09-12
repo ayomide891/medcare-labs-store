@@ -45,15 +45,19 @@ df = pd.DataFrame(data, columns=["ID","Name","Category","USD","NGN","Status","Qt
 
 # --- Helper to get founder image ---
 def get_founder_image():
-    # Check if you uploaded founder.jpg to GitHub
+    # Check if you uploaded IMG
+    if os.path.exists("IMG_0262.jpeg"):
+        return "IMG_0262.jpeg"
     if os.path.exists("founder.jpg"):
         return "founder.jpg"
     if os.path.exists("founder.png"):
         return "founder.png"
     # Placeholder if not yet uploaded
-    return "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+    return "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop"
+    
+    
 
-# --- WELCOME PAGE ---
+# --   WELCOME PAGE ---
 if st.session_state.page == "welcome":
     st.markdown("<h1 style='text-align:center; color:#0a4a7a; margin-top:20px;'>Welcome Valued Customer</h1>", unsafe_allow_html=True)
     st.markdown(f"<h2 style='text-align:center;'>Welcome to {COMPANY['name']}</h2>", unsafe_allow_html=True)
