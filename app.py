@@ -11,8 +11,7 @@ COMPANY = {
     "phone": "09142981813",
     "email": "feyishababe@gmail.com",
     "founder": "Feyisara Olatunji",
-    "whatsapp": "2349142981813"
-}
+    "whatsapp": "2347070496138"}
 
 if 'page' not in st.session_state:
     st.session_state.page = "welcome"
