@@ -11,7 +11,6 @@ COMPANY = {
     "name": "MEDCARE LABS Company Store",
     "tagline": "--WE CARE FOR YOUR HEALTH--",
     "address": "Berger, Lagos",
-    "phone": "09142981813",
     "whatsapp": "2347070496138",
     "founder": "Feyisara Olatunji",
     "email": "feyishababe@gmail.com"
