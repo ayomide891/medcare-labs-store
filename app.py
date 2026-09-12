@@ -78,7 +78,7 @@ def load_products():
 df = load_products()
 
 def get_founder_image():
-    for f in ["founder.jpg","founder.png","feyisara.jpg","profile.jpg","founder.jpeg"]:
+    for f in ["IMG_0262.jpeg", "IMG_0262.jpg", "founder.jpg", "founder.png", "feyisara.jpg"]:
         if os.path.exists(f):
             return f
     return None
