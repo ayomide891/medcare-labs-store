@@ -70,15 +70,7 @@ if st.session_state.page == "welcome":
         st.image(img, caption=f"Meet {COMPANY['founder']}", use_container_width=True)
         st.success(f"👩‍🔬 Founder & CEO: {COMPANY['founder']}")
         
-        # Admin hint
-        with st.expander("🔧 Founder: How to add your real picture"):
-            st.write("1. Go to GitHub repo `medcare-labs-store`")
-            st.write("2. Tap Add file → Upload files")
-            st.write("3. Upload your best photo named exactly: `founder.jpg`")
-            st.write("4. Commit → Your picture will appear automatically here!")
-            upload = st.file_uploader("Preview your picture now (temporary)", type=["jpg","png"])
-            if upload:
-                st.image(upload, caption="Preview - Upload this to GitHub as founder.jpg to save")
+   
     
     with col2:
         st.markdown(f"### Meet {COMPANY['founder']}")
