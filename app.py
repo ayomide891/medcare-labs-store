@@ -99,7 +99,7 @@ if not st.session_state.show_store:
     st.markdown("""
     <div style='background:#e6f4ea; padding:12px; border-radius:10px;'>
     <b>👩‍🔬 Founder & CEO: Feyisara Olatunji</b><br>
-    <small>Founder: How to add your real picture</small>
+
     </div>
     """, unsafe_allow_html=True)
 
