@@ -18,28 +18,15 @@ if 'page' not in st.session_state:
 if 'cart' not in st.session_state:
     st.session_state.cart = []
 
-data = [
-["MED-LAB-001","Binocular Microscope","Microscopy",320,480000,"In Stock",15],
-["MED-LAB-002","Centrifuge Machine","Sample Prep",185,277500,"In Stock",12],
-["MED-LAB-003","Autoclave 50L","Sterilization",890,1335000,"In Stock",8],
-["MED-LAB-004","Spectrophotometer","Analytical",2450,3675000,"In Stock",5],
-["MED-LAB-005","Incubator 80L","Culture",650,975000,"In Stock",10],
-["MED-LAB-006","pH Meter","Measurement",95,142500,"In Stock",25],
-["MED-LAB-007","Analytical Balance","Measurement",420,630000,"In Stock",9],
-["MED-LAB-008","Hot Air Oven 30L","Sterilization",380,570000,"In Stock",7],
-["MED-LAB-009","Micropipette Set","Liquid Handling",55,82500,"In Stock",40],
-["MED-LAB-010","Water Bath 8 Hole","Culture",210,315000,"In Stock",11],
-["MED-LAB-011","Vortex Mixer","Sample Prep",125,187500,"In Stock",18],
-["MED-LAB-012","Mag Stirrer Hot Plate","Sample Prep",165,247500,"In Stock",14],
-["MED-LAB-013","Refrig Centrifuge","Sample Prep",1950,2925000,"In Stock",4],
-["MED-LAB-014","Biosafety Cabinet","Safety",2850,4275000,"In Stock",3],
-["MED-LAB-015","PCR Thermal Cycler","Molecular",4200,6300000,"In Stock",2],
-["MED-LAB-016","Gel Doc System","Molecular",7800,11700000,"In Stock",2],
-["MED-LAB-017","Lab Refrigerator 150L","Storage",950,1425000,"In Stock",6],
-["MED-LAB-018","Deep Freezer -86C","Storage",3200,4800000,"In Stock",3],
-["MED-LAB-019","Hematology Analyzer","Diagnostic",3600,5400000,"In Stock",4],
-["MED-LAB-020","Chemistry Analyzer","Diagnostic",1850,2775000,"In Stock",5],
-]
+# --- Load products from Google Sheet ---
+SHEET_URL = "https://docs.google.com/spreadsheets/d/1Yt_tCJ752RyYBpRlZJzh9pFBQAKM3gyo/export?format=csv"
+try:
+    df_sheet = pd.read_csv(SHEET_URL)
+    data = df_sheet.values.tolist()
+except:
+    data = [
+        ["MED-LAB-001", "Binocular Microscope", "Microscope for lab use", "50000"]
+    ]
 df = pd.DataFrame(data, columns=["ID","Name","Category","USD","NGN","Status","Qty"])
 
 # --- Helper to get founder image ---
