@@ -3,7 +3,7 @@ import pandas as pd
 import os
 from datetime import datetime
 
-st.set_page_config(page_title="MEDCARE LABS - Official Store", page_icon="🧬", layout="wide")
+st.set_page_config(page_title="MEDCARE LABS STORE", layout="wide")
 
 COMPANY = {
     "name": "MEDCARE LABS",
@@ -18,122 +18,143 @@ if 'page' not in st.session_state:
 if 'cart' not in st.session_state:
     st.session_state.cart = []
 
-# --- Load products from Google Sheet ---
+# --- GOOGLE SHEET FOR PRODUCTS ---
 SHEET_URL = "https://docs.google.com/spreadsheets/d/1Yt_tCJ752RyYBpRlZJzh9pFBQAKM3gyo/export?format=csv"
-try:
-    df_sheet = pd.read_csv(SHEET_URL)
-    data = df_sheet.values.tolist()
-except:
-    data = [
-        ["MED-LAB-001", "Binocular Microscope", "Microscope for lab use", "50000"]
-    ]
-df = pd.DataFrame(data, columns=["ID","Name","Category","USD","NGN","Status","Qty"])
 
-# --- Helper to get founder image ---
+def convert_drive_link(link):
+    """Convert Google Drive share link to direct image link"""
+    if not isinstance(link, str):
+        return link
+    if "drive.google.com" in link and "id=" in link:
+        try:
+            file_id = link.split("id=")[1].split("&")[0]
+            return f"https://drive.google.com/uc?export=view&id={file_id}"
+        except:
+            return link
+    if "drive.google.com" in link and "/d/" in link:
+        try:
+            file_id = link.split("/d/")[1].split("/")[0]
+            return f"https://drive.google.com/uc?export=view&id={file_id}"
+        except:
+            return link
+    return link
+
+@st.cache_data(ttl=60)
+def load_products():
+    try:
+        df = pd.read_csv(SHEET_URL)
+        # Clean column names
+        df.columns = [c.strip() for c in df.columns]
+        # Convert drive images if you have Image column
+        if "Image" in df.columns:
+            df["Image"] = df["Image"].apply(convert_drive_link)
+        if "Image_URL" in df.columns:
+            df["Image_URL"] = df["Image_URL"].apply(convert_drive_link)
+        return df
+    except Exception as e:
+        st.error(f"Could not load Sheet: {e}")
+        # Fallback
+        data = [
+            ["MED-LAB-001", "Binocular Microscope", "Professional lab microscope", "50000", ""],
+            ["MED-LAB-002", "Centrifuge Machine", "Sample preparation centrifuge", "75000", ""],
+        ]
+        return pd.DataFrame(data, columns=["ID", "Name", "Description", "Price", "Image"])
+
+df = load_products()
+
+# --- Founder image helper (NO ADMIN HINT) ---
 def get_founder_image():
-    # Check if you uploaded IMG
-    if os.path.exists("IMG_0262.jpeg"):
-        return "IMG_0262.jpeg"
-    if os.path.exists("founder.jpg"):
-        return "founder.jpg"
-    if os.path.exists("founder.png"):
-        return "founder.png"
-    # Placeholder if not yet uploaded
-    return "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop"
-    
-    
+    for fname in ["founder.jpg", "founder.png", "feyisara.jpg", "profile.jpg"]:
+        if os.path.exists(fname):
+            return fname
+    return None
 
-# --   WELCOME PAGE ---
+# --- SIDEBAR ---
+st.sidebar.title(COMPANY["name"])
+st.sidebar.write(COMPANY["address"])
+if st.sidebar.button("🏠 Home"):
+    st.session_state.page = "welcome"
+if st.sidebar.button("🛒 Shop Products"):
+    st.session_state.page = "shop"
+if st.sidebar.button(f"🧺 Cart ({len(st.session_state.cart)})"):
+    st.session_state.page = "cart"
+
+st.sidebar.divider()
+st.sidebar.write(f"📞 {COMPANY['phone']}")
+st.sidebar.write(f"📧 {COMPANY['email']}")
+
+# --- PAGES ---
 if st.session_state.page == "welcome":
-    st.markdown("<h1 style='text-align:center; color:#0a4a7a; margin-top:20px;'>Welcome Valued Customer</h1>", unsafe_allow_html=True)
-    st.markdown(f"<h2 style='text-align:center;'>Welcome to {COMPANY['name']}</h2>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align:center; color:gray;'>Berger, Lagos | Trusted Lab Equipment Supplier</p>", unsafe_allow_html=True)
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    col1, col2 = st.columns([1,1.6], gap="large")
-    
+    st.title(f"Welcome to {COMPANY['name']}")
+    st.subheader(f"Founded by {COMPANY['founder']}")
+
+    col1, col2 = st.columns([1, 2])
     with col1:
-        img = get_founder_image()
-        st.image(img, caption=f"Meet {COMPANY['founder']}", use_container_width=True)
-        st.success(f"👩‍🔬 Founder & CEO: {COMPANY['founder']}")
-        
-   
-    
+        founder_img = get_founder_image()
+        if founder_img:
+            st.image(founder_img, caption=COMPANY["founder"], width=250)
+        else:
+            st.info("Add founder.jpg to GitHub repo to show your picture")
+
     with col2:
-        st.markdown(f"### Meet {COMPANY['founder']}")
-        st.write(f"""
-        **Dear Valued Customer,**
-
-        On behalf of the entire {COMPANY['name']} family, I warmly welcome you to our official online store.
-
-        I am **{COMPANY['founder']}**, founder of {COMPANY['name']}. My journey started with a simple vision: to make high-quality, reliable laboratory equipment accessible to every hospital, clinic, and research lab in Nigeria.
-
-        From our base in **{COMPANY['address']}**, we have served hundreds of clients who trust us for authenticity and after-sales support.
-
-        Every product you see in this store has been carefully selected for durability, accuracy, and value for money. Whether you are setting up a new lab or upgrading your current facility, my team and I are here to support you.
-
-        Thank you for choosing us. We value your trust.
-
-        **Warmly,**
-        **{COMPANY['founder']}**
-        *Founder & CEO, {COMPANY['name']}*
-        """)
-        st.markdown("---")
-        st.write(f"📍 {COMPANY['address']} | 📞 {COMPANY['phone']} | ✉️ {COMPANY['email']}")
-
-    st.markdown("<br><br>", unsafe_allow_html=True)
-    if st.button("🛒 CONTINUE TO STORE →", use_container_width=True, type="primary"):
-        st.session_state.page = "store"
-        st.rerun()
-
-# --- STORE PAGE ---
-else:
-    c1, c2, c3 = st.columns([3,1,1])
-    with c1:
-        st.title(f"{COMPANY['name']} 🧬")
-        st.caption(f"{COMPANY['address']} | {COMPANY['phone']}")
-    with c2:
-        if st.button("🏠 Welcome Page"): 
-            st.session_state.page = "welcome"
+        st.write("### Quality Lab Equipment in Lagos")
+        st.write("We supply microscopes, centrifuges, and all laboratory essentials.")
+        st.write(f"**WhatsApp:** {COMPANY['whatsapp']}")
+        if st.button("Start Shopping →"):
+            st.session_state.page = "shop"
             st.rerun()
-    with c3:
-        st.metric("Cart", len(st.session_state.cart))
 
-    s1, s2 = st.columns(2)
-    with s1: search = st.text_input("🔍 Search")
-    with s2: cat = st.selectbox("Category", ["All"] + sorted(df["Category"].unique().tolist()))
+elif st.session_state.page == "shop":
+    st.title("Our Products")
+    st.write(f"Loaded {len(df)} products from Google Sheet")
 
-    filtered = df.copy()
-    if search: filtered = filtered[filtered.apply(lambda r: search.lower() in str(r.values).lower(), axis=1)]
-    if cat != "All": filtered = filtered[filtered["Category"]==cat]
+    cols = st.columns(3)
+    for i, row in df.iterrows():
+        with cols[i % 3]:
+            # Handle different possible column names
+            name = row.get("Name", row.get("name", "Product"))
+            price = row.get("Price", row.get("price", "0"))
+            desc = row.get("Description", row.get("description", ""))
+            img = row.get("Image", row.get("Image_URL", row.get("image", "")))
 
-    st.markdown(f"**{len(filtered)} Products Available**")
-    cols = st.columns(2)
-    for i, row in filtered.iterrows():
-        with cols[i % 2]:
-            with st.container(border=True):
-                st.markdown(f"**{row['Name']}**")
-                st.caption(f"{row['ID']} | {row['Category']}")
-                st.write(f"💵 ${row['USD']} | ₦{row['NGN']:,}")
-                if st.button(f"Add to Cart", key=f"add_{row['ID']}", use_container_width=True):
-                    st.session_state.cart.append(row.to_dict())
-                    st.toast(f"Added {row['Name']}")
+            if pd.notna(img) and img!= "":
+                st.image(img, use_container_width=True)
 
-    st.divider()
-    st.subheader("🛒 Your Order")
+            st.write(f"**{name}**")
+            st.write(f"{desc}")
+            st.write(f"**₦{price}**")
+
+            if st.button("Add to Cart", key=f"add_{i}"):
+                st.session_state.cart.append(row.to_dict())
+                st.success(f"Added {name}")
+
+elif st.session_state.page == "cart":
+    st.title("Your Cart")
     if not st.session_state.cart:
-        st.info("Cart empty")
+        st.write("Cart is empty")
+        if st.button("Go to Shop"):
+            st.session_state.page = "shop"
+            st.rerun()
     else:
-        cart_df = pd.DataFrame(st.session_state.cart)
-        st.dataframe(cart_df[["Name","USD","NGN"]], hide_index=True, use_container_width=True)
-        total_usd = cart_df["USD"].sum()
-        total_ngn = cart_df["NGN"].sum()
-        st.write(f"**Total: ${total_usd} / ₦{total_ngn:,}**")
-        msg = f"Hello MEDCARE LABS, I want to order:%0A" + "%0A".join([f"- {x['Name']}" for x in st.session_state.cart]) + f"%0ATotal ${total_usd}"
-        st.link_button("📲 WhatsApp Order", f"https://wa.me/{COMPANY['whatsapp']}?text={msg}", type="primary", use_container_width=True)
+        total = 0
+        for item in st.session_state.cart:
+            price_str = str(item.get("Price", item.get("price", "0"))).replace(",", "")
+            try:
+                total += float(price_str)
+            except:
+                pass
+            st.write(f"- {item.get('Name')} - ₦{item.get('Price')}")
+
+        st.divider()
+        st.write(f"**Total: ₦{total}**")
+
+        wa_text = f"Hello {COMPANY['name']}, I want to order: "
+        for item in st.session_state.cart:
+            wa_text += f"{item.get('Name')}, "
+        wa_link = f"https://wa.me/{COMPANY['whatsapp']}?text={wa_text}"
+
+        st.link_button("Order via WhatsApp", wa_link)
+
         if st.button("Clear Cart"):
             st.session_state.cart = []
             st.rerun()
-
-    st.markdown("---")
-    st.markdown(f"<center>© 2026 {COMPANY['name']} | Founded by {COMPANY['founder']} | {COMPANY['address']}</center>", unsafe_allow_html=True)
